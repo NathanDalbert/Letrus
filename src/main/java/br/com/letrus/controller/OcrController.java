@@ -1,7 +1,7 @@
 package br.com.letrus.controller;
 
 import br.com.letrus.service.GoogleVisionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,14 +12,11 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/ocr")
+@AllArgsConstructor
 public class OcrController {
 
     private final GoogleVisionService visionService;
 
-    @Autowired
-    public OcrController(GoogleVisionService visionService) {
-        this.visionService = visionService;
-    }
     @CrossOrigin(origins = "http://localhost:63342")
     @PostMapping("/detect-text")
     public ResponseEntity<String> detectText(@RequestParam("file") MultipartFile file) {

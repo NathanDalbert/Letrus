@@ -19,27 +19,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 public class SecurityConfigurations {
 
-
     private final SecurityFilter securityFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())  // Desativa o CSRF (em APIs com autenticação via token, geralmente é necessário)
+
                 .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Garante que a aplicação seja sem estado
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Permite acesso livre ao login
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() // Permite acesso livre ao registro
-                        .requestMatchers(HttpMethod.POST, "/produto").hasRole("SELLER") // Acesso restrito a vendedores
-                        .requestMatchers(HttpMethod.POST, "/api/ocr/detect-text").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/produto/**").hasRole("SELLER") // Atualizações apenas para vendedores
-                        .requestMatchers(HttpMethod.DELETE, "/produto/**").hasRole("SELLER") // Deleções apenas para vendedores
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Acesso restrito a admin
-                        .requestMatchers("/usuario/**").hasRole("USER")
-                        .requestMatchers("/usario/").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/*").permitAll()  // Permite acesso aos endpoints da API
+                        .requestMatchers("/usuario/").permitAll()  // Permite acesso ao endpoint do usuário
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Permite acesso ao Swagger
-                        .anyRequest().authenticated()) // Qualquer outra requisição requer autenticação
+                        .anyRequest().authenticated())  // Exige autenticação para outras requisições
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class) // Adiciona o filtro de segurança
                 .build();
     }
@@ -53,4 +48,5 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

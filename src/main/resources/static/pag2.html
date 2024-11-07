@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Previsão de Texto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Teste de Previsão de Texto</h2>
+    <input type="text" id="textInput" placeholder="Digite algo...">
+    <button onclick="getPrediction()">Obter Previsão</button>
+    <div id="loading" class="loading">Processando texto...</div>
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+    // Função para obter a previsão de texto
+    async function getPrediction() {
+        const textInput = document.getElementById('textInput');
+        const text = textInput.value;
+
+        if (!text) {
+            alert("Por favor, digite algum texto.");
+            return;
+        }
+
+        // Exibe o loading enquanto aguarda a resposta
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('result').textContent = ''; // Limpa o resultado anterior
+
+        try {
+            // A API Spring Boot está rodando localmente, então a URL será "http://localhost:8090/api/chatgpt/completar"
+            const response = await fetch('http://localhost:8090/api/chatgpt/completar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`  // Corrigido com crase
+                },
+                body: JSON.stringify({ prompt: text })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao fazer requisição de previsão');
+            }
+
+            const data = await response.json();
+            document.getElementById('result').textContent = data.text || "Nenhuma previsão disponível.";
+        } catch (error) {
+            console.error(error);
+            document.getElementById('result').textContent = 'Erro ao processar o texto.';
+        } finally {
+            document.getElementById('loading').style.display = 'none'; // Oculta o loading após a resposta
+        }
+    }
+</script>
+
+</body>
+</html>
