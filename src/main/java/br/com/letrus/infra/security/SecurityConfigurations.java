@@ -32,6 +32,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Permite acesso livre ao login
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() // Permite acesso livre ao registro
                         .requestMatchers(HttpMethod.POST, "/produto").hasRole("SELLER") // Acesso restrito a vendedores
+                        .requestMatchers(HttpMethod.POST, "/api/ocr/detect-text").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/produto/**").hasRole("SELLER") // Atualizações apenas para vendedores
                         .requestMatchers(HttpMethod.DELETE, "/produto/**").hasRole("SELLER") // Deleções apenas para vendedores
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Acesso restrito a admin
