@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste OCR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+            display: block;
+            margin: 0 auto 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .image-preview {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Teste OCR com Google Vision</h2>
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
+    <button onclick="uploadImage()">Enviar Imagem</button>
+    <div id="loading" class="loading">Processando imagem...</div>
+    <img id="imagePreview" class="image-preview" style="display: none;">
+    <div id="result" class="result"></div>
+    <button onclick="readText()" style="margin-top: 10px;">Ler em Áudio</button>
+</div>
+
+<script>
+    // Função para exibir a pré-visualização da imagem
+    function previewImage() {
+        const fileInput = document.getElementById('imageInput');
+        const file = fileInput.files[0];
+        const imagePreview = document.getElementById('imagePreview');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview.style.display = 'block';
+                imagePreview.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.style.display = 'none';
+        }
+    }
+
+    // Função para enviar a imagem e realizar o OCR
+    async function uploadImage() {
+        const fileInput = document.getElementById('imageInput');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert("Por favor, selecione uma imagem.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Exibe o loading enquanto aguarda a resposta
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('result').textContent = ''; // Limpa o resultado anterior
+
+        try {
+            const response = await fetch('http://localhost:8090/api/ocr/detect-text', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao fazer requisição OCR');
+            }
+
+            console.log(response)
+
+            const data = await response.text();
+            document.getElementById('result').textContent = data || "Nenhum texto detectado.";
+        } catch (error) {
+            console.error(error);
+            document.getElementById('result').textContent = 'Erro ao processar a imagem.';
+        } finally {
+            document.getElementById('loading').style.display = 'none'; // Oculta o loading após a resposta
+        }
+    }
+    function readText() {
+        const text = document.getElementById('result').textContent;
+
+        if (text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR'; // Define o idioma para português do Brasil
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Nenhum texto para ler.");
+        }
+    }
+</script>
+
+</body>
+</html>
