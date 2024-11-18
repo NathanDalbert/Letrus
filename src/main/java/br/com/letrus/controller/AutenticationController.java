@@ -53,6 +53,7 @@ public class AutenticationController {
     }
 
     @PostMapping("/register")
+    @CrossOrigin(origins = "http://127.0.0.1:5501")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterDTO data) {
         if (usuarioRepository.findByEmail(data.email()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email já está em uso.");
