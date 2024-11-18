@@ -26,6 +26,7 @@ public class AutenticationController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
+    @CrossOrigin(origins = "http://127.0.0.1:5501")
     public ResponseEntity<?> login(@RequestBody @Valid AutenticationDTO data) {
         var usuarioOptional = usuarioRepository.findByEmail(data.email());
 

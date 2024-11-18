@@ -91,7 +91,7 @@
         <button type="submit">Cadastrar</button>
     </form>
     <div class="message">
-        Já tem uma conta? <a href="/login">Faça login</a>
+        Já tem uma conta? <a href="login.html">Faça login</a>
     </div>
     <div class="loading" id="loading">Cadastrando...</div>
 </div>
@@ -190,7 +190,7 @@
         <button type="submit">Cadastrar</button>
     </form>
     <div class="message">
-        Já tem uma conta? <a href="/login">Faça login</a>
+        Já tem uma conta? <a href="login.html">Faça login</a>
     </div>
     <div class="loading" id="loading">Cadastrando...</div>
 </div>
@@ -219,7 +219,7 @@
             loading.classList.remove('show'); // Esconde o indicador de carregamento
             if (response.ok) {
                 alert('Usuário registrado com sucesso! Agora você pode fazer login.');
-                window.location.href = '/login.html'; // Redireciona para a página de login
+                window.location.href = 'login.html'; // Redireciona para a página de login
             } else {
                 return response.json(); // Retorna como JSON em caso de erro
             }
