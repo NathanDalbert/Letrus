@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .message a:hover {
+            text-decoration: underline;
+        }
+
+        /* Indicador de carregamento */
+        .loading {
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        <button type="submit">Entrar</button>
+    </form>
+    <div class="message">
+        Não tem uma conta? <a href="/registro">Registre-se</a>
+    </div>
+    <div class="loading" id="loading">Autenticando...</div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const loading = document.getElementById('loading');
+
+      // Exibe o indicador de carregamento
+      loading.classList.add('show');
+
+      // Envia o JSON com os campos "email" e "senha"
+      fetch('http://localhost:8090/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              email: email,  // Passando o valor do campo email
+              senha: password  // Passando o valor do campo senha
+          })
+      })
+      .then(response => {
+          if (!response.ok) {
+              // Se a resposta não for OK, lança um erro com a mensagem do servidor
+              return response.json().then(err => { throw new Error(err.message || 'Erro na resposta do servidor') });
+          }
+          return response.json(); // Se a resposta for OK, retorna o corpo como JSON
+      })
+      .then(data => {
+          loading.classList.remove('show'); // Esconde o indicador de carregamento
+
+          if (data && data.token) {
+              // Armazena o token no localStorage
+              localStorage.setItem('token', data.token);
+
+              // Tenta redirecionar para a página de dashboard após login bem-sucedido
+              try {
+                  window.location.href = '/pag2'; // Modifique para o caminho correto
+              } catch (error) {
+                  console.error('Erro ao redirecionar:', error);
+                  alert('Ocorreu um erro ao tentar redirecionar. Tente novamente mais tarde.');
+              }
+          } else {
+              alert(data ? data.message : 'Erro desconhecido'); // Exibe a mensagem de erro se disponível
+          }
+      })
+      .catch(error => {
+          loading.classList.remove('show'); // Esconde o indicador de carregamento
+          console.error('Erro:', error);
+          alert(`Erro ao fazer login: ${error.message || 'Erro desconhecido'}`);
+      });
+  });
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .message a:hover {
+            text-decoration: underline;
+        }
+
+        /* Indicador de carregamento */
+        .loading {
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Cadastro</h2>
+    <form id="registerForm">
+        <input type="text" id="name" placeholder="Nome" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        <button type="submit">Cadastrar</button>
+    </form>
+    <div class="message">
+        Já tem uma conta? <a href="/login">Faça login</a>
+    </div>
+    <div class="loading" id="loading">Cadastrando...</div>
+</div>
+
+<script>
+    <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f7fc;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .message a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .message a:hover {
+            text-decoration: underline;
+        }
+
+        /* Indicador de carregamento */
+        .loading {
+            display: none;
+            text-align: center;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .loading.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Cadastro</h2>
+    <form id="registerForm">
+        <input type="text" id="nome" placeholder="Nome" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        <button type="submit">Cadastrar</button>
+    </form>
+    <div class="message">
+        Já tem uma conta? <a href="/login">Faça login</a>
+    </div>
+    <div class="loading" id="loading">Cadastrando...</div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        e.preventDefault(); // Previne o comportamento padrão de envio do formulário
+
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const loading = document.getElementById('loading');
+
+        // Mostra o indicador de carregamento
+        loading.classList.add('show');
+
+        // Enviando os dados para o servidor (backend)
+        fetch('http://localhost:8090/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nome, email, senha: password })  // JSON com os campos no formato desejado
+        })
+        .then(response => {
+            loading.classList.remove('show'); // Esconde o indicador de carregamento
+            if (response.ok) {
+                alert('Usuário registrado com sucesso! Agora você pode fazer login.');
+                window.location.href = '/login.html'; // Redireciona para a página de login
+            } else {
+                return response.json(); // Retorna como JSON em caso de erro
+            }
+        })
+        .then(data => {
+            if (data && data.message) {
+                alert(data.message); // Exibe uma mensagem de erro, caso haja
+            }
+        })
+        .catch(error => {
+            loading.classList.remove('show'); // Esconde o indicador de carregamento
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao tentar registrar o usuário.');
+        });
+    });
+</script>
+
+</body>
+</html>
+
+</script>
+
+</body>
+</html>
