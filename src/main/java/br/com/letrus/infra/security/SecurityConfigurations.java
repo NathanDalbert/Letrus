@@ -36,6 +36,8 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll() // Permite acesso livre ao login
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() // Permite acesso livre ao registro
                         .requestMatchers(HttpMethod.POST, "/api/chat-gpt/completar").permitAll() // Permite acesso ao chat GPT
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll() // Permite acesso livre ao registro
+                        .requestMatchers(HttpMethod.POST, "/text-correction/check-grammar").permitAll() // Permite acesso ao chat GPT
                         .requestMatchers(HttpMethod.POST, "/api/ocr/detect-text").permitAll() // Permite acesso ao OCR
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Acesso ao Swagger
                         .anyRequest().authenticated()) // Qualquer outra requisição requer autenticação

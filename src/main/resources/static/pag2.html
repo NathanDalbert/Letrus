@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste de Previsão de Texto</title>
+    <title>Teste de Correção de Texto</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,15 +62,15 @@
 <body>
 
 <div class="container">
-    <h2>Teste de Previsão de Texto</h2>
+    <h2>Teste de Correção de Texto</h2>
     <input type="text" id="textInput" placeholder="Digite algo...">
-    <button onclick="getPrediction()">Obter Previsão</button>
+    <button onclick="getCorrection()">Obter Correção</button>
     <div id="loading" class="loading">Processando texto...</div>
     <div id="result" class="result"></div>
 </div>
 
 <script>
-    async function getPrediction() {
+    async function getCorrection() {
         const textInput = document.getElementById('textInput');
         const text = textInput.value.trim();
 
@@ -87,38 +87,54 @@
 
         document.getElementById('loading').style.display = 'block';
         document.getElementById('result').textContent = '';
+        document.querySelector('button').disabled = true; // Desabilita o botão durante o processamento
 
         try {
-            const response = await fetch('http://localhost:8090/api/chat-gpt/completar', {
+            const response = await fetch('http://localhost:8090/text-correction/check-grammar', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Accept-Language': 'pt-BR'  // Adicionando o cabeçalho para o idioma
                 },
-                body: JSON.stringify({ prompt: text })
+                body: JSON.stringify({ text: text })
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                const data = await response.json();
+
+                // Verifica se o campo "matches" existe e é um array
+                if (Array.isArray(data.matches)) {
+                    let correctedText = text;  // Texto original que será corrigido
+
+                    // Loop pelas sugestões de correção
+                    data.matches.forEach(match => {
+                        if (match.replacements && match.replacements.length > 0) {
+                            // Extraímos o texto de contexto corretamente
+                            const incorrectWord = match.context.text.slice(match.offset, match.offset + match.length);
+                            const correctedWord = match.replacements[0].value;  // Substitui pela primeira sugestão
+
+                            // Substitui todas as ocorrências da palavra incorreta no texto original
+                            const regex = new RegExp(incorrectWord, 'g');
+                            correctedText = correctedText.replace(regex, correctedWord);
+                        }
+                    });
+
+                    // Exibe o texto corrigido
+                    document.getElementById('result').textContent = `Texto corrigido: \n${correctedText}`;
+                } else {
+                    document.getElementById('result').textContent = "Resposta da API está malformada.";
+                }
+            } else {
                 const errorMessage = await response.text();
                 throw new Error(`Erro na API: ${response.status} - ${errorMessage}`);
             }
-
-            const contentType = response.headers.get('Content-Type');
-            let resultText = '';
-
-            if (contentType && contentType.includes('application/json')) {
-                const data = await response.json();
-                resultText = data.text || "Nenhuma previsão disponível.";
-            } else {
-                resultText = await response.text();
-            }
-
-            document.getElementById('result').textContent = resultText;
         } catch (error) {
             console.error('Erro:', error);
             document.getElementById('result').textContent = `Erro ao processar o texto: ${error.message}`;
         } finally {
             document.getElementById('loading').style.display = 'none';
+            document.querySelector('button').disabled = false; // Reabilita o botão após o processamento
         }
     }
 </script>
