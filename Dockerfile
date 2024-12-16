@@ -1,16 +1,23 @@
-FROM ubuntu:latest AS build
+# Etapa de Build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-21-jdk -y
+# Defina o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Copie o código fonte para o contêiner
 COPY . .
 
-RUN apt-get install maven -y
-RUN mvn clean install
+# Execute o build do projeto
+RUN mvn clean install -DskipTests
 
+# Etapa Final
 FROM openjdk:21-jdk-slim
 
+# Exponha a porta da aplicação
 EXPOSE 8080
 
-COPY --from=build /target/Meu-dia-a-dia-0.0.1-SNAPSHOT.jar app.jar
+# Copie o arquivo JAR gerado na etapa de build
+COPY --from=build /app/target/Letrus-0.0.1-SNAPSHOT.jar app.jar
 
-ENTRYPOINT [ "java", "-jar", "app.jar"]
+# Comando para iniciar a aplicação
+ENTRYPOINT ["java", "-jar", "app.jar"]
