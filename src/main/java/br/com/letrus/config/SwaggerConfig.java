@@ -28,14 +28,14 @@ public class SwaggerConfig {
                 .components(new Components().addSecuritySchemes("Authorization", securityScheme))
                 .addSecurityItem(securityRequirement)
                 .info(new Info()
-                        .title("Agro Mapping API")
-                        .description("Documentação da API para o projeto Agro Mapping")
+                        .title("Letrus")
+                        .description("Documentação da API para o projeto Letrus")
                         .version("v1.0")
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
                         .description("Documentação Completa")
-                        .url("https://Agro_Mapping.com/docs"));
+                        .url("https://letrus.com/docs"));
     }
 }
